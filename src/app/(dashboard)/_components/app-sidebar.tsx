@@ -35,22 +35,22 @@ const data = {
   navMain: [
     {
       title: "Transaksi",
-      url: "#",
+      url: "/admin/transaksi",
       icon: IconDashboard,
     },
     {
       title: "Produk",
-      url: "#",
+      url: "/admin/produk",
       icon: IconListDetails,
     },
     {
       title: "Laporan",
-      url: "#",
+      url: "/admin/laporan",
       icon: IconChartBar,
     },
     {
       title: "Alert",
-      url: "#",
+      url: "/admin/alert",
       icon: IconFolder,
     },
   ],
