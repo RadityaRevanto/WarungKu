@@ -48,6 +48,16 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+function CardDescriptionLaporan({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-description"
+      className={cn("text-muted-foreground text-lg font-bold", className)}
+      {...props}
+    />
+  )
+}
+
 function CardDescriptionAlert({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -99,5 +109,6 @@ export {
   CardAction,
   CardDescription,
   CardDescriptionAlert,
+  CardDescriptionLaporan,
   CardContent,
 }

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Calendar } from "lucide-react"
 
 import { useIsMobile } from "@/src/hooks/use-mobile"
 import {
@@ -167,10 +168,13 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Total Visitors</CardTitle>
+        <div className="flex items-center gap-2">
+          <Calendar className="text-black-600 size-5" />
+          <CardTitle>Grafik Penjualan</CardTitle>
+        </div>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Total for the last 3 months
+            Tren Penjualan harian Dan Mingguan
           </span>
           <span className="@[540px]/card:hidden">Last 3 months</span>
         </CardDescription>
