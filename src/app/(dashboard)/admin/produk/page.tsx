@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { DashboardLayout } from "@/src/app/(dashboard)/_components/dashboard-layout";
 import { createColumns } from "./components/column";
 import { DataTable } from "./components/data-table";
 import { MyFormData } from "./components/table";
@@ -64,32 +65,34 @@ const columns = createColumns();
     setEditingUser(null);
     setIsDialogOpen(true);
   };
-return (
-    <div className="p-6">
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{editingUser ? "Edit" : "Create New"}</DialogTitle>
-            <DialogDescription>
-              Please fill out the form below to {editingUser ? "update the data" : "create a new data"}.
-            </DialogDescription>
-          </DialogHeader>
-          <div>
-            <UserForm
-              initialData={editingUser}
-              onCreate={handleCreate}
-              onUpdate={handleUpdate}
-          />
-          </div>
-        </DialogContent>
-      </Dialog>
-      <DataTable
-        columns={columns}
-        data={data}
-        onAdd={openCreateDialog}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-    </div>
+  return (
+    <DashboardLayout>
+      <div className="p-6">
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingUser ? "Edit" : "Create New"}</DialogTitle>
+              <DialogDescription>
+                Please fill out the form below to {editingUser ? "update the data" : "create a new data"}.
+              </DialogDescription>
+            </DialogHeader>
+            <div>
+              <UserForm
+                initialData={editingUser}
+                onCreate={handleCreate}
+                onUpdate={handleUpdate}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+        <DataTable
+          columns={columns}
+          data={data}
+          onAdd={openCreateDialog}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
+    </DashboardLayout>
   );
 }
