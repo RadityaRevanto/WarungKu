@@ -10,7 +10,7 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-100 bg-white/95 backdrop-blur">
+    <header className="fixed top-0 left-0 z-50 w-full border-b border-slate-100 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5">
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -35,9 +35,9 @@ export default function Navbar() {
           ))}
         </nav>
 
-        <button className="rounded-full bg-[#6A34F5] px-6 py-2 text-sm font-semibold text-white shadow-sm shadow-[#6A34F5]/30 transition hover:bg-[#5825d6]">
+        <Link href={"/login"} className="rounded-full bg-[#6A34F5] px-6 py-2 text-sm font-semibold text-white shadow-sm shadow-[#6A34F5]/30 transition hover:bg-[#5825d6]">
           Login
-        </button>
+        </Link>
       </div>
     </header>
   );

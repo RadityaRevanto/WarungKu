@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DashboardLayout } from "@/src/app/(dashboard)/_components/dashboard-layout";
 import { createColumns } from "./components/column";
 import { DataTable } from "./components/data-table";
@@ -16,13 +16,13 @@ import {
 import { UserForm } from "./components/form";
 
 const initialData: MyFormData[] = [
-   {
+  {
     id: "1",
     name_4603829743: "Indomie Goreng",
     name_0878515932: "Rp 3.500",
     name_0706064476: 20,
     name_6646786819: 86010424,
-    
+
   },
   {
     id: "2",
@@ -31,14 +31,32 @@ const initialData: MyFormData[] = [
     name_0706064476: 30,
     name_6646786819: 86010424,
   },
-  
 ];
+
+
 
 export default function TablePage() {
   const [data, setData] = useState<MyFormData[]>(initialData);
   const [editingUser, setEditingUser] = useState<MyFormData | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-const columns = createColumns();
+  const [products, setProducts] = useState([]);
+  const columns = createColumns();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/admin/products');
+        const productsData = await response.json();
+        setProducts(productsData);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, [])
+
+  console.log(products)
 
   const handleCreate = (newRecord: Omit<MyFormData, "id">) => {
     const record = { ...newRecord, id: String(data.length + 1) };
