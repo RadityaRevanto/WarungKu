@@ -2,7 +2,7 @@ import { IconShield, IconFolder, IconHeart } from "@tabler/icons-react";
 
 export default function Produk() {
     return (
-        <section id="Produk" className="relative w-full bg-white mt-65 md:mt-140 xl:mt-180 2xl:mt-210">
+        <section id="Produk" className="relative w-full bg-white mt-65 md:mt-140 lg:mt-160 xl:mt-180 2xl:mt-210">
             <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
                 {/* Logo Partners Section */}
                 <div className="mb-16 flex flex-wrap items-center justify-center gap-8 md:gap-12 lg:gap-16">
@@ -16,7 +16,7 @@ export default function Produk() {
                         Raditya Revanto
                     </div>
                     <div className="flex items-center gap-2 text-2xl font-semibold text-slate-400">
-                        Clarista Felesiya Wijaya
+                        Clarista Felisya Wijaya
                     </div>
                 </div>
 
