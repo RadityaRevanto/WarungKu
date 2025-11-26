@@ -1,12 +1,10 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../generated/prisma/client"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -14,23 +12,23 @@ model User {
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
-  
-  products  Product[]
-  sales     Sale[]
+
+  products Product[]
+  sales    Sale[]
 }
 
 model Product {
-  id        String   @id @default(uuid()) 
+  id        String   @id @default(uuid())
   name      String
   price     Float
   stock     Int
   minStock  Int      @default(5)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   // Relations
   userId    String
-  user      User      @relation(fields: [userId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
   saleItems SaleItem[]
 }
 
@@ -38,19 +36,19 @@ model Sale {
   id          String   @id @default(uuid())
   totalAmount Float
   saleDate    DateTime @default(now())
-  
+
   // Relations
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  items       SaleItem[]
+  userId String
+  user   User       @relation(fields: [userId], references: [id])
+  items  SaleItem[]
 }
 
 model SaleItem {
-  id        String @id @default(uuid())
-  quantity  Int
-  unitPrice Float
+  id         String @id @default(uuid())
+  quantity   Int
+  unitPrice  Float
   totalPrice Float
-  
+
   // Relations
   saleId    String
   sale      Sale    @relation(fields: [saleId], references: [id])

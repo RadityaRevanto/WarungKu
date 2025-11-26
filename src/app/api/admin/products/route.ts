@@ -1,7 +1,7 @@
 import prisma from "@/src/lib/prisma";
 import { NextResponse } from "next/server";
 
-export default async function GET() {
+export async function GET() {
     const products = await prisma.product.findMany();
 
     if (!products) {

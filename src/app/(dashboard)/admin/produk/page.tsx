@@ -45,7 +45,7 @@ export default function TablePage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/admin/products');
+        const response = await fetch('http://localhost:3000/api/admin/products');
         const productsData = await response.json();
         setProducts(productsData);
       } catch (error) {
