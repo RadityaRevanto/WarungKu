@@ -1,7 +1,7 @@
 
 export default function Hero() {
     return (
-        <section id="hero" className="relative w-full bg-white">
+        <section id="hero" className="relative mt-32 w-full bg-white pb-16 md:pb-24 lg:pb-32">
             <div className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-slate-50 to-white" />
 
             <div className="pointer-events-none absolute inset-0 hidden 2xl:block">
@@ -70,8 +70,8 @@ export default function Hero() {
                 </div>
             </div>
 
-            <div className="pointer-events-none absolute inset-0 ">
-                <div className="relative inset-x-0 top-20 z-0 w-full ">
+            <div className="pointer-events-none absolute inset-0">
+                <div className="relative inset-x-0 top-20 z-0 w-full">
                     <img
                         src="/assets/images/hero/Vector 2.png"
                         alt=""
@@ -101,10 +101,10 @@ export default function Hero() {
                         alt="Hero background"
                         className="h-ful w-full object-cover"
                     />
-                </div> 
+                </div>
             </div>
 
-            <div className="relative -mt-25 mx-auto flex min-h-[520px] max-w-5xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6 lg:px-10">
+            <div className="relative z-10 -mt-25 mx-auto flex min-h-[520px] max-w-5xl flex-col items-center justify-center px-4 py-24 text-center sm:px-6 lg:px-10">
                 <h1 className="text-4xl font-bold leading-tight text-slate-900 sm:text-5xl lg:text-6xl">
                     Build Your Transaction <br /> By <span className="text-blue-600">WarungKu</span> APP.
                 </h1>

@@ -6,7 +6,7 @@ import About from "../components/sections/about";
 
 export default function Home() {
   return (
-    <div className="w-full min-h-screen">
+    <div className="w-full min-h-screen overflow-x-hidden relative">
       <Navbar />
       <Hero />
       <Produk />
