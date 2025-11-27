@@ -17,10 +17,11 @@ export function UserForm({ initialData, onCreate, onUpdate }: UserFormProps) {
     name_4603829743: "",
     name_0878515932: "",
     name_0706064476: 0,
-    name_6646786819: 0,
+    name_6646786819: "",
     name_6646786821: 10,
   });
 
+  // Di form.tsx - ubah useEffect
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -30,15 +31,24 @@ export function UserForm({ initialData, onCreate, onUpdate }: UserFormProps) {
         name_6646786819: initialData.name_6646786819,
         name_6646786821: initialData.name_6646786821 ?? 10,
       });
+    } else {
+      // Reset form untuk mode create
+      setFormData({
+        name_4603829743: "",
+        name_0878515932: "",
+        name_0706064476: 0,
+        name_6646786819: "",
+        name_6646786821: 10,
+      });
     }
-  }, [initialData]);
+  }, [initialData?.id]); // Hanya trigger jika ID berubah, bukan object
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.type === "number"
-        ? Number(e.target.value)
-        : e.target.value,
+      [name]: type === "number" ? Number(value) : value,
     });
   };
 
@@ -88,11 +98,10 @@ export function UserForm({ initialData, onCreate, onUpdate }: UserFormProps) {
       <div className="space-y-2">
         <Label>Barcode</Label>
         <Input
-          type="number"
+          type="text" // ← Ubah dari "number" ke "text"
           name="name_6646786819"
           value={formData.name_6646786819}
           onChange={handleChange}
-          required
         />
       </div>
 

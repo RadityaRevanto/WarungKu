@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useState, useEffect } from "react"
 import {
   IconCamera,
   IconChartBar,
@@ -26,87 +27,69 @@ import {
   SidebarMenuItem,
 } from "@/src/components/ui/sidebar"
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Transaksi",
-      url: "/admin/transaksi",
-      icon: IconDashboard,
-    },
-    {
-      title: "Produk",
-      url: "/admin/produk",
-      icon: IconListDetails,
-    },
-    {
-      title: "Laporan",
-      url: "/admin/laporan",
-      icon: IconChartBar,
-    },
-    {
-      title: "Alert",
-      url: "/admin/alert",
-      icon: IconFolder,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [],
-  documents: [],
-}
+// import auth BetterAuth
+import { authClient, useSession } from "@/lib/auth-client"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+ const { data: session } = useSession()
+  const [currentUser, setCurrentUser] = useState({
+    name: "Loading...",
+    email: "loading@example.com",
+    avatar: "/avatars/shadcn.jpg",
+  })
+
+  useEffect(() => {
+    if (session?.user) {
+      setCurrentUser({
+        name: session.user.name || "No Name",
+        email: session.user.email,
+        avatar: session.user.image || "/avatars/shadcn.jpg",
+      })
+    }
+  }, [session])
+
+  const data = {
+    user: currentUser, 
+    navMain: [
+      { title: "Transaksi", url: "/admin/transaksi", icon: IconDashboard },
+      { title: "Produk", url: "/admin/produk", icon: IconListDetails },
+      { title: "Laporan", url: "/admin/laporan", icon: IconChartBar },
+      { title: "Alert", url: "/admin/alert", icon: IconFolder },
+    ],
+    navClouds: [
+      {
+        title: "Capture",
+        icon: IconCamera,
+        isActive: true,
+        url: "#",
+        items: [
+          { title: "Active Proposals", url: "#" },
+          { title: "Archived", url: "#" },
+        ],
+      },
+      {
+        title: "Proposal",
+        icon: IconFileDescription,
+        url: "#",
+        items: [
+          { title: "Active Proposals", url: "#" },
+          { title: "Archived", url: "#" },
+        ],
+      },
+      {
+        title: "Prompts",
+        icon: IconFileAi,
+        url: "#",
+        items: [
+          { title: "Active Proposals", url: "#" },
+          { title: "Archived", url: "#" },
+        ],
+      },
+    ],
+    navSecondary: [],
+    documents: [],
+  };
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
