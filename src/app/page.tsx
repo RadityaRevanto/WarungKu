@@ -3,6 +3,7 @@ import Hero from "@/src/components/sections/hero";
 import Navbar from "@/src/components/layouts/navbar";
 import Produk from "../components/sections/produk";
 import About from "../components/sections/about";
+import Choseus from "../components/sections/chose-us";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       <Hero />
       <Produk />
       <About />
+      <Choseus />
     </div>
   );
 }
