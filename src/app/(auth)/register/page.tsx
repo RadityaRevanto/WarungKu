@@ -1,9 +1,9 @@
 import { auth } from "@/lib/auth";
-import LoginSection from "./login-section";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import SignupPage from "./register-section";
 
-export default async function LoginPage() {
+export default async function RegisterPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -12,5 +12,5 @@ export default async function LoginPage() {
     redirect("/admin");
   }
 
-  return <LoginSection />;
+  return <SignupPage />;
 }
