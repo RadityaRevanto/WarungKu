@@ -4,6 +4,8 @@ import Navbar from "@/src/components/layouts/navbar";
 import Produk from "../components/sections/produk";
 import About from "../components/sections/about";
 import Choseus from "../components/sections/chose-us";
+import Client from "../components/sections/client";
+import Footer from "../components/sections/footer";
 
 export default function Home() {
   return (
@@ -13,6 +15,10 @@ export default function Home() {
       <Produk />
       <About />
       <Choseus />
+      <Client />
+      <section id="footer">
+        <Footer />
+      </section>
     </div>
   );
 }
