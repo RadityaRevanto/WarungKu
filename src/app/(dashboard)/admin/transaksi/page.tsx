@@ -38,6 +38,8 @@ export default function AdminWarungTransaksi() {
   const [isScanning, setIsScanning] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -68,33 +70,31 @@ export default function AdminWarungTransaksi() {
     }
   }, [mounted]);
 
+  // Filter products based on search
   useEffect(() => {
-    if (!search || !products.length) return;
-
-    const found = products.find(
-      (p) =>
-        p.barcode.toLowerCase() === search.toLowerCase() ||
-        p.name.toLowerCase().includes(search.toLowerCase())
-    );
-
-    if (found) {
-      setSelectedProduct(found);
-      addToCart(found);
-      setSearch("");
-    }
-  }, [search, products]);
-
-  const addToCart = (productOverride?: Product) => {
-    const product = productOverride || selectedProduct;
-    if (!product) {
-      toast.error("Pilih produk terlebih dahulu");
+    if (!search.trim()) {
+      setFilteredProducts([]);
+      setShowSearchResults(false);
       return;
     }
 
+    const searchLower = search.toLowerCase();
+    const filtered = products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(searchLower) ||
+        p.barcode.toLowerCase().includes(searchLower)
+    );
+
+    setFilteredProducts(filtered);
+    setShowSearchResults(true);
+  }, [search, products]);
+
+  const addToCartDirectly = (product: Product, quantity: number = 1) => {
     const currentQtyInCart = cart.find((c) => c.product.id === product.id)?.qty || 0;
-    if (currentQtyInCart + qty > product.stock) {
+
+    if (currentQtyInCart + quantity > product.stock) {
       toast.error(
-        `Stock tersisa: ${product.stock}, di keranjang: ${currentQtyInCart}`
+        `Stock tidak cukup! Stock tersisa: ${product.stock}, di keranjang: ${currentQtyInCart}`
       );
       return;
     }
@@ -104,15 +104,34 @@ export default function AdminWarungTransaksi() {
     if (existing) {
       setCart((prev) =>
         prev.map((c) =>
-          c.product.id === product.id ? { ...c, qty: c.qty + qty } : c
+          c.product.id === product.id ? { ...c, qty: c.qty + quantity } : c
         )
       );
     } else {
-      setCart([...cart, { product, qty }]);
+      setCart([...cart, { product, qty: quantity }]);
     }
 
+    toast.success(`${product.name} ditambahkan ke keranjang (${quantity}x)`);
+  };
+
+  const addToCart = () => {
+    if (!selectedProduct) {
+      toast.error("Pilih produk terlebih dahulu");
+      return;
+    }
+
+    addToCartDirectly(selectedProduct, qty);
     setQty(1);
-    toast.success(`${product.name} ditambahkan ke keranjang`);
+    setSelectedProduct(null);
+  };
+
+  // Handle selecting product from search results - AUTO ADD TO CART
+  const handleSelectFromSearch = (product: Product) => {
+    setSearch("");
+    setShowSearchResults(false);
+
+    // Langsung tambahkan ke cart dengan qty 1
+    addToCartDirectly(product, 1);
   };
 
   const total = cart.reduce(
@@ -156,7 +175,7 @@ export default function AdminWarungTransaksi() {
       printReceipt(sale);
 
       setCart([]);
-      
+
       const refreshResponse = await fetch("/api/admin/products");
       const refreshedProducts = await refreshResponse.json();
       setProducts(
@@ -199,8 +218,8 @@ export default function AdminWarungTransaksi() {
         <div class="center">${new Date(sale.saleDate).toLocaleString("id-ID")}</div>
         <div class="divider"></div>
         ${sale.items
-          .map(
-            (item: any) => `
+        .map(
+          (item: any) => `
           <div class="item">
             <span>${item.product.name}</span>
           </div>
@@ -209,8 +228,8 @@ export default function AdminWarungTransaksi() {
             <span>Rp ${item.totalPrice.toLocaleString()}</span>
           </div>
         `
-          )
-          .join("")}
+        )
+        .join("")}
         <div class="divider"></div>
         <div class="item total">
           <span>TOTAL</span>
@@ -239,7 +258,20 @@ export default function AdminWarungTransaksi() {
       const result = await codeReader.decodeOnceFromVideoDevice(undefined, videoElement);
 
       if (result) {
-        setSearch(result.getText());
+        const scannedBarcode = result.getText();
+
+        // Find product by exact barcode match
+        const found = products.find(
+          (p) => p.barcode.toLowerCase() === scannedBarcode.toLowerCase()
+        );
+
+        if (found) {
+          // Auto add to cart from scan with qty 1
+          addToCartDirectly(found, 1);
+        } else {
+          toast.error(`Produk dengan barcode "${scannedBarcode}" tidak ditemukan`);
+        }
+
         setIsScanning(false);
       }
     } catch (err) {
@@ -250,9 +282,10 @@ export default function AdminWarungTransaksi() {
   };
 
   if (!mounted) return null;
+
   return (
     <DashboardLayout>
-       <Toaster />
+      <Toaster />
       <div className="p-6 bg-gradient-to-b from-blue-50 to-blue-100 min-h-screen">
         {/* SCANNER POPUP */}
         {isScanning && (
@@ -282,19 +315,57 @@ export default function AdminWarungTransaksi() {
                 <Plus className="w-5 h-5" /> Tambah Item
               </CardTitle>
               <p className="text-gray-500 text-sm mt-1">
-                Pilih produk dan masukkan jumlah
+                Cari produk atau scan barcode
               </p>
             </CardHeader>
 
             <CardContent className="space-y-4">
               {/* SEARCH + SCAN */}
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Cari produk atau scan barcode..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="h-12 rounded-xl"
-                />
+              <div className="flex gap-2 relative">
+                <div className="relative flex-1">
+                  <Input
+                    placeholder="Cari produk (nama atau barcode)..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    onFocus={() => {
+                      if (filteredProducts.length > 0) {
+                        setShowSearchResults(true);
+                      }
+                    }}
+                    className="h-12 rounded-xl"
+                  />
+
+                  {/* Search Results Dropdown */}
+                  {showSearchResults && filteredProducts.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-xl shadow-lg z-10 max-h-60 overflow-y-auto">
+                      {filteredProducts.map((product) => (
+                        <button
+                          key={product.id}
+                          onClick={() => handleSelectFromSearch(product)}
+                          className="w-full p-3 hover:bg-blue-50 text-left border-b last:border-b-0 transition-colors"
+                        >
+                          <div className="font-semibold">{product.name}</div>
+                          <div className="text-sm text-gray-600">
+                            Rp {product.price.toLocaleString()} • Stock: {product.stock}
+                            {product.barcode && (
+                              <span className="ml-2 text-gray-400">
+                                ({product.barcode})
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* No Results */}
+                  {showSearchResults && filteredProducts.length === 0 && search.trim() && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-xl shadow-lg z-10 p-4 text-center text-gray-500">
+                      Produk tidak ditemukan
+                    </div>
+                  )}
+                </div>
+
                 <Button
                   variant="outline"
                   className="h-12 px-5 rounded-xl"
@@ -305,7 +376,14 @@ export default function AdminWarungTransaksi() {
                 </Button>
               </div>
 
-              {/* SELECT */}
+              {/* Atau pemisah */}
+              <div className="flex items-center gap-2">
+                <div className="flex-1 border-t"></div>
+                <span className="text-gray-400 text-sm">atau pilih manual</span>
+                <div className="flex-1 border-t"></div>
+              </div>
+
+              {/* SELECT - untuk pilih manual dengan custom qty */}
               <Select
                 value={selectedProduct?.id}
                 onValueChange={(val) => {
@@ -314,7 +392,7 @@ export default function AdminWarungTransaksi() {
                 }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Pilih produk" />
+                  <SelectValue placeholder="Pilih produk dari dropdown" />
                 </SelectTrigger>
                 <SelectContent className="w-full">
                   {products.map((p) => (
@@ -325,7 +403,7 @@ export default function AdminWarungTransaksi() {
                 </SelectContent>
               </Select>
 
-              {/* QTY + BUTTON */}
+              {/* QTY + BUTTON - hanya untuk manual select */}
               <div className="grid grid-cols-3 gap-3">
                 <Input
                   type="number"
@@ -337,24 +415,36 @@ export default function AdminWarungTransaksi() {
                 <Button
                   className="col-span-2 h-12 rounded-xl text-base flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-800"
                   onClick={() => addToCart()}
+                  disabled={!selectedProduct}
                 >
                   <Plus className="w-4 h-4" />
                   Tambah ke Keranjang
                 </Button>
               </div>
+
+              {/* Selected Product Info */}
+              {selectedProduct && (
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm text-gray-600">Produk dipilih:</p>
+                  <p className="font-semibold">{selectedProduct.name}</p>
+                  <p className="text-sm text-gray-600">
+                    Rp {selectedProduct.price.toLocaleString()} • Stock: {selectedProduct.stock}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
-          {/* RIGHT */}
+          {/* RIGHT - Keranjang */}
           <Card className="rounded-2xl p-4">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <ShoppingCart className="w-5 h-5" />
-                Keranjang
+                Keranjang ({cart.length} item)
               </CardTitle>
             </CardHeader>
 
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-96 overflow-y-auto">
               {cart.length === 0 && (
                 <p className="text-center text-gray-400 py-8">Keranjang kosong</p>
               )}
@@ -402,51 +492,47 @@ export default function AdminWarungTransaksi() {
                               )
                             );
                           } else {
-                            // toast({
-                            //   title: "Stock Habis",
-                            //   description: `Stock maksimal: ${item.product.stock}`,
-                            //   variant: "destructive",
-                            // });
+                            toast.error(`Stock maksimal: ${item.product.stock}`);
                           }
                         }}
-                        className="px-3 py-1 bg-gray-200 rounded-lg text-lg hover:bg-gray-300"
+                      className="px-3 py-1 bg-gray-200 rounded-lg text-lg hover:bg-gray-300"
                       >
-                        +
-                      </button>
-                    </div>
-
-                    <span className="font-semibold">
-                      Rp {(item.qty * item.product.price).toLocaleString()}
-                    </span>
-
-                    <button
-                      onClick={() => removeItem(item.product.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 size={20} />
+                      +
                     </button>
                   </div>
+
+                  <span className="font-semibold min-w-[100px] text-right">
+                    Rp {(item.qty * item.product.price).toLocaleString()}
+                  </span>
+
+                  <button
+                    onClick={() => removeItem(item.product.id)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
                 </div>
               ))}
-            </div>
-
-            {/* TOTAL */}
-            <div className="flex justify-between text-lg mt-6 pt-3 border-t">
-              <span className="font-semibold">Total:</span>
-              <span className="font-semibold">Rp {total.toLocaleString()}</span>
-            </div>
-
-            <Button
-              className="w-full mt-6 text-lg py-6 bg-green-600 hover:bg-green-700"
-              onClick={handleCheckout}
-              disabled={isProcessing || cart.length === 0}
-            >
-              <Printer size={20} className="mr-2" />
-              {isProcessing ? "Memproses..." : "Checkout & Print"}
-            </Button>
-          </Card>
         </div>
-      </div>
-    </DashboardLayout>
+
+        {/* TOTAL */}
+        <div className="flex justify-between text-lg mt-6 pt-3 border-t">
+          <span className="font-semibold">Total:</span>
+          <span className="font-semibold text-xl">Rp {total.toLocaleString()}</span>
+        </div>
+
+        <Button
+          className="w-full mt-6 text-lg py-6 bg-green-600 hover:bg-green-700"
+          onClick={handleCheckout}
+          disabled={isProcessing || cart.length === 0}
+        >
+          <Printer size={20} className="mr-2" />
+          {isProcessing ? "Memproses..." : "Checkout & Print"}
+        </Button>
+      </Card>
+    </div>
+      </div >
+    </DashboardLayout >
   );
 }
