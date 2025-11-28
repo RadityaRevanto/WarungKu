@@ -13,6 +13,7 @@ interface ProdukTerlaris {
   name: string
   price: number
   quantitySold: number
+  revenue?: number
 }
 
 interface ProdukTerlarisProps {
@@ -25,30 +26,6 @@ const dummyData: ProdukTerlaris[] = [
     id: "1",
     name: "Indomie Goreng",
     price: 3500,
-    quantitySold: 1,
-  },
-  {
-    id: "2",
-    name: "Air Mineral 330ml",
-    price: 3500,
-    quantitySold: 1,
-  },
-  {
-    id: "3",
-    name: "Kapal Api Sachet",
-    price: 3500,
-    quantitySold: 1,
-  },
-  {
-    id: "4",
-    name: "Mie Sedap Goreng",
-    price: 3500,
-    quantitySold: 1,
-  },
-  {
-    id: "5",
-    name: "Teh Botol Sosro",
-    price: 5000,
     quantitySold: 1,
   },
 ]
@@ -90,8 +67,9 @@ export function ProdukTerlaris({ data = dummyData }: ProdukTerlarisProps) {
               </div>
             </div>
 
-            <div className="font-medium text-foreground">
-              {formatPrice(produk.price)}
+            <div className="font-medium text-right">
+              <div>{formatPrice(produk.revenue ?? produk.price)}</div>
+              <div className="text-xs text-muted-foreground">Harga satuan: {formatPrice(produk.price)}</div>
             </div>
           </div>
         ))}
