@@ -32,6 +32,7 @@ export function NavMain({
                 tooltip={item.title}
                 asChild
                 isActive={pathname === item.url}
+                className="text-lg font-medium shadow-sm transition-all duration-300 hover:shadow-md hover:scale-105 hover:translate-x-1 mt-2 h-15 w-62 overflow-hidden"
               >
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
