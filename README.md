@@ -1,36 +1,224 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏪 WarungKu — Offline-First POS untuk Warung & Toko Kecil
 
-## Getting Started
+WarungKu adalah aplikasi POS (Point of Sale) modern yang dirancang untuk membantu warung kecil mengelola produk, transaksi, dan stok secara lebih efisien. Aplikasi ini mendukung **offline-first**, sehingga tetap bisa digunakan meski tanpa internet.
 
-First, run the development server:
+---
+
+## 📌 Problem Statement
+
+Banyak warung/toko kecil masih mengandalkan:
+
+* Catatan manual,
+* Kalkulator,
+* Perhitungan omzet yang tidak terdata rapi.
+
+Akibatnya:
+
+* Sulit memantau stok,
+* Sulit melihat omzet harian/mingguan,
+* Human error tinggi,
+* Tidak ada laporan otomatis.
+
+WarungKu hadir untuk menyelesaikan masalah tersebut.
+
+---
+
+## 🚀 Core Features
+
+### 📦 1. Product Catalog
+
+CRUD produk:
+
+* Nama produk
+* Harga
+* Stok
+* Barcode (opsional)
+* Minimal stok (untuk alert)
+
+### 💸 2. Transaction System
+
+* Input penjualan dengan memilih produk
+* Quantity
+* Auto-calculate total
+* Simpan transaksi ke database
+* Mendukung transaksi offline
+
+### 📊 3. Sales Summary
+
+* Ringkasan omzet harian & mingguan
+* Tampilkan simple chart untuk visualisasi penjualan
+
+### ⚠️ 4. Stock Alert
+
+* Notifikasi stok menipis berdasarkan minimal stok
+* Membantu pemilik warung melakukan restock tepat waktu
+
+---
+
+## ✨ “Wow Factor” — Fitur Pembeda
+
+### 📷 Barcode Scanner
+
+* Web: Quick search menggunakan barcode/keyword
+
+### 🧾 Print Receipt
+
+* Web → generate PDF struk otomatis
+
+### 🔌 Offline-First (Super Penting!)
+
+Aplikasi tetap bisa dipakai untuk transaksi meski **tidak ada internet**:
+
+* Semua transaksi offline akan disimpan di IndexedDB
+* Saat online, sistem akan melakukan auto-sync
+* Tidak ada transaksi hilang
+
+---
+
+## 🛠️ Teknologi Utama (opsional, edit sesuai project-mu)
+
+* Next.js
+* Supabase (Database + Auth)
+* IndexedDB (Offline Queue)
+* Prisma ORM
+* ShadCN UI
+* TailwindCSS
+
+---
+
+## 📎 Lisensi
+
+Project bebas digunakan untuk kebutuhan pembelajaran dan pengembangan.
+
+---
+
+## 💬 Kontribusi
+
+Kontribusi dipersilakan!
+Fork → Pull Request → Review → Merge.
+
+---
+
+## 🛠️ Install & Setup
+
+Ikuti langkah berikut untuk menjalankan WarungKu secara lokal.
+
+---
+
+### 🔧 **1. Clone Repository**
+
+```bash
+git clone https://github.com/username/warungku.git
+cd warungku
+```
+
+---
+
+### 📦 **2. Install Dependencies**
+
+Menggunakan npm:
+
+```bash
+npm install
+```
+
+Atau menggunakan pnpm:
+
+```bash
+pnpm install
+```
+
+---
+
+### 🔐 **3. Setup Environment Variables**
+
+Copy file env template:
+
+```bash
+cp .env.example .env.local
+```
+
+Isi variabel berikut (sesuaikan dengan project-mu):
+
+```
+DATABASE_URL=" "
+DIRECT_URL=" "
+
+NEXT_PUBLIC_SUPABASE_URL=" "
+NEXT_PUBLIC_SUPABASE_ANON_KEY=" "
+
+BETTER_AUTH_SECRET=" "
+BETTER_AUTH_URL="http://localhost:3000"
+
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+```
+
+Tambahkan jika memakai auth atau storage.
+
+---
+
+### 🗄️ **4. Setup Database**
+
+Jalankan migration Prisma:
+
+```bash
+npx prisma migrate dev
+```
+
+Generate Prisma Client:
+
+```bash
+npx prisma generate
+```
+
+Jika menggunakan Supabase, pastikan tabel sudah sesuai schema.
+
+---
+
+### 🚀 **5. Jalankan Development Server**
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplikasi akan berjalan pada:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+### 🌐 **6. Build untuk Production**
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📱 **7. Enable Offline-First (IndexedDB)**
 
-## Deploy on Vercel
+Tidak perlu konfigurasi tambahan.
+IndexedDB otomatis aktif ketika user membuka aplikasi di browser modern.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Jika ingin reset manual:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* Buka **DevTools → Application → IndexedDB**
+* Pilih database `WarungKuOfflineDB`
+* Hapus object store jika perlu
+
+---
+
+### 🧪 **8. Testing (Opsional)**
+
+```bash
+npm run test
+```
+
+---
+
+### 🎉 Selesai!
+
+WarungKu siap digunakan—online atau offline.
