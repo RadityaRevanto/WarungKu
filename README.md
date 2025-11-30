@@ -43,7 +43,7 @@ CRUD produk:
 * Simpan transaksi ke database
 * Mendukung transaksi offline
 
-### 📊 3. Sales Summary
+### 3. Sales Summary
 
 * Ringkasan omzet harian & mingguan
 * Tampilkan simple chart untuk visualisasi penjualan
@@ -219,6 +219,6 @@ npm run test
 
 ---
 
-### 🎉 Selesai!
+### Selesai!
 
 WarungKu siap digunakan—online atau offline.
