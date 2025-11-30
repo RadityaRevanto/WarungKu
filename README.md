@@ -1,10 +1,10 @@
-# 🏪 WarungKu — Offline-First POS untuk Warung & Toko Kecil
+# WarungKu — Offline-First POS untuk Warung & Toko Kecil
 
 WarungKu adalah aplikasi POS (Point of Sale) modern yang dirancang untuk membantu warung kecil mengelola produk, transaksi, dan stok secara lebih efisien. Aplikasi ini mendukung **offline-first**, sehingga tetap bisa digunakan meski tanpa internet.
 
 ---
 
-## 📌 Problem Statement
+## Problem Statement
 
 Banyak warung/toko kecil masih mengandalkan:
 
@@ -23,9 +23,9 @@ WarungKu hadir untuk menyelesaikan masalah tersebut.
 
 ---
 
-## 🚀 Core Features
+## Core Features
 
-### 📦 1. Product Catalog
+### 1. Product Catalog
 
 CRUD produk:
 
@@ -35,7 +35,7 @@ CRUD produk:
 * Barcode (opsional)
 * Minimal stok (untuk alert)
 
-### 💸 2. Transaction System
+### 2. Transaction System
 
 * Input penjualan dengan memilih produk
 * Quantity
@@ -48,24 +48,24 @@ CRUD produk:
 * Ringkasan omzet harian & mingguan
 * Tampilkan simple chart untuk visualisasi penjualan
 
-### ⚠️ 4. Stock Alert
+### 4. Stock Alert
 
 * Notifikasi stok menipis berdasarkan minimal stok
 * Membantu pemilik warung melakukan restock tepat waktu
 
 ---
 
-## ✨ “Wow Factor” — Fitur Pembeda
+## “Wow Factor” — Fitur Pembeda
 
-### 📷 Barcode Scanner
+### Barcode Scanner
 
 * Web: Quick search menggunakan barcode/keyword
 
-### 🧾 Print Receipt
+### Print Receipt
 
 * Web → generate PDF struk otomatis
 
-### 🔌 Offline-First (Super Penting!)
+### Offline-First (Super Penting!)
 
 Aplikasi tetap bisa dipakai untuk transaksi meski **tidak ada internet**:
 
@@ -75,7 +75,7 @@ Aplikasi tetap bisa dipakai untuk transaksi meski **tidak ada internet**:
 
 ---
 
-## 🛠️ Teknologi Utama (opsional, edit sesuai project-mu)
+## Teknologi Utama (opsional, edit sesuai project-mu)
 
 * Next.js
 * Supabase (Database + Auth)
@@ -86,26 +86,26 @@ Aplikasi tetap bisa dipakai untuk transaksi meski **tidak ada internet**:
 
 ---
 
-## 📎 Lisensi
+## Lisensi
 
 Project bebas digunakan untuk kebutuhan pembelajaran dan pengembangan.
 
 ---
 
-## 💬 Kontribusi
+## Kontribusi
 
 Kontribusi dipersilakan!
 Fork → Pull Request → Review → Merge.
 
 ---
 
-## 🛠️ Install & Setup
+## Install & Setup
 
 Ikuti langkah berikut untuk menjalankan WarungKu secara lokal.
 
 ---
 
-### 🔧 **1. Clone Repository**
+### **1. Clone Repository**
 
 ```bash
 git clone https://github.com/username/warungku.git
@@ -114,7 +114,7 @@ cd warungku
 
 ---
 
-### 📦 **2. Install Dependencies**
+### **2. Install Dependencies**
 
 Menggunakan npm:
 
@@ -130,7 +130,7 @@ pnpm install
 
 ---
 
-### 🔐 **3. Setup Environment Variables**
+### **3. Setup Environment Variables**
 
 Copy file env template:
 
@@ -157,7 +157,7 @@ Tambahkan jika memakai auth atau storage.
 
 ---
 
-### 🗄️ **4. Setup Database**
+### **4. Setup Database**
 
 Jalankan migration Prisma:
 
@@ -175,7 +175,7 @@ Jika menggunakan Supabase, pastikan tabel sudah sesuai schema.
 
 ---
 
-### 🚀 **5. Jalankan Development Server**
+### **5. Jalankan Development Server**
 
 ```bash
 npm run dev
@@ -189,7 +189,7 @@ http://localhost:3000
 
 ---
 
-### 🌐 **6. Build untuk Production**
+### **6. Build untuk Production**
 
 ```bash
 npm run build
@@ -198,7 +198,7 @@ npm start
 
 ---
 
-### 📱 **7. Enable Offline-First (IndexedDB)**
+### **7. Enable Offline-First (IndexedDB)**
 
 Tidak perlu konfigurasi tambahan.
 IndexedDB otomatis aktif ketika user membuka aplikasi di browser modern.
@@ -211,7 +211,7 @@ Jika ingin reset manual:
 
 ---
 
-### 🧪 **8. Testing (Opsional)**
+### **8. Testing (Opsional)**
 
 ```bash
 npm run test
