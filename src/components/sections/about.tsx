@@ -7,7 +7,7 @@ export default function About() {
         <section id="about" className="relative min-h-screen w-full overflow-hidden bg-[url(/assets/images/about/bg-about.png)] bg-cover bg-center bg-no-repeat py-16 md:py-24 lg:py-32">
             <div className="container mx-auto px-4">
                 <div className="xl:flex xl:items-center xl:justify-center xl:gap-12 xl:px-8">
-                    <div className="mx-auto -mt-15 md:w-140 xl:mx-0 xl:mt-0 xl:flex-shrink-0 xl:w-auto">
+                    <div className="mx-auto -mt-15 md:w-140 xl:mx-0 xl:mt-0 xl:flex-shrink-0 xl:w-160">
                         <Image
                             src="/assets/images/about/icon-about.png"
                             alt="About decor"
