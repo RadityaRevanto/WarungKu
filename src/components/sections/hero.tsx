@@ -1,4 +1,6 @@
 
+import Image from "next/image";
+
 export default function Hero() {
     return (
         <section id="hero" className="relative mt-32 w-full bg-white pb-16 md:pb-24 lg:pb-32">
@@ -6,65 +8,89 @@ export default function Hero() {
 
             <div className="pointer-events-none absolute inset-0 hidden 2xl:block">
                 <div className="relative top-40 left-48">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 1.png"
                         alt="Hero icon"
+                        width={152}
+                        height={152}
+                        loading="lazy"
                         className="h-38 w-38 drop-shadow-xl"
                     />
                 </div>
 
                 <div className="relative top-92 left-16">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 2.png"
                         alt="Hero icon"
+                        width={168}
+                        height={168}
+                        loading="lazy"
                         className="h-42 w-42 drop-shadow-xl"
                     />
                 </div>
 
                 <div className="relative -bottom-10 left-72">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 3.png"
                         alt="Hero icon"
+                        width={128}
+                        height={128}
+                        loading="lazy"
                         className="h-32 w-32 drop-shadow-xl"
                     />
                 </div>
 
                 <div className="relative bottom-82 left-320">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 4.png"
                         alt="Hero icon"
+                        width={128}
+                        height={128}
+                        loading="lazy"
                         className="h-32 w-32 drop-shadow-xl"
                     />
                 </div>
 
                 <div className="relative bottom-72 left-290">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 5.png"
                         alt="Hero icon"
+                        width={128}
+                        height={128}
+                        loading="lazy"
                         className="h-32 w-32 drop-shadow-xl"
                     />
                 </div>
 
                 <div className="relative bottom-60 left-325">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 6.png"
                         alt="Hero icon"
+                        width={128}
+                        height={128}
+                        loading="lazy"
                         className="h-32 w-32 drop-shadow-xl"
                     />
                 </div>
 
                 <div className="relative -top-40 left-70">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 7.png"
                         alt="Hero icon"
+                        width={128}
+                        height={128}
+                        loading="lazy"
                         className="h-32 w-32 drop-shadow-xl"
                     />
                 </div>
 
                 <div className="relative bottom-185 left-365">
-                    <img
+                    <Image
                         src="/assets/images/hero/Icon 8.png"
                         alt="Hero icon"
+                        width={128}
+                        height={128}
+                        loading="lazy"
                         className="h-32 w-32 drop-shadow-xl"
                     />
                 </div>
@@ -72,33 +98,45 @@ export default function Hero() {
 
             <div className="pointer-events-none absolute inset-0">
                 <div className="relative inset-x-0 top-20 z-0 w-full">
-                    <img
+                    <Image
                         src="/assets/images/hero/Vector 2.png"
                         alt=""
+                        width={1920}
+                        height={600}
+                        loading="lazy"
                         className="h-full w-full object-cover"
                     />
                 </div>
 
                 <div className="relative top-15 w-100 mx-auto md:w-150 md:-top-85 xl:-top-235 xl:w-250 2xl:-top-280">
-                    <img
+                    <Image
                         src="/assets/images/hero/Vector.png"
                         alt="Hero background"
+                        width={1920}
+                        height={800}
+                        loading="lazy"
                         className="h-ful w-full object-cover"
                     />
                 </div>
 
                 <div className="relative bottom-170 h-170 mx-auto z-10 w-full md:bottom-320 md:mx-auto md:h-250 md:w-full xl:-top-580 xl:w-full xl:h-350 2xl:-top-650">
-                    <img
+                    <Image
                         src="/assets/images/hero/Mask group.png"
                         alt="Hero background"
+                        width={1920}
+                        height={900}
+                        loading="lazy"
                         className="h-full w-full object-cover"
                     />
                 </div>
 
                 <div className="relative -top-250 mx-auto w-full 0 z-15 md:-top-470 md:w-150 xl:-top-770 xl:w-200 2xl:-top-880 2xl:w-250">
-                    <img
+                    <Image
                         src="/assets/images/hero/icon 9.png"
                         alt="Hero background"
+                        width={1920}
+                        height={900}
+                        loading="lazy"
                         className="h-ful w-full object-cover"
                     />
                 </div>

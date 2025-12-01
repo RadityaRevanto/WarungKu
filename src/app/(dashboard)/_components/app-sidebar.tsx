@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import {
   IconCamera,
   IconChartBar,
@@ -100,7 +101,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <div className="flex items-center gap-2 h-20">
-              <img src="/assets/images/navbar/Logo WarungKu.png" alt="WarungKu" className="w-20 h-20 object-contain" />  
+              <Image
+                src="/assets/images/navbar/Logo WarungKu.png"
+                alt="WarungKu"
+                width={80}
+                height={80}
+                loading="lazy"
+                className="w-20 h-20 object-contain"
+              />  
               <a href="#">
                 <span className="text-2xl font-semibold">WarungKu</span>
               </a>
