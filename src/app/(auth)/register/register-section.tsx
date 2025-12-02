@@ -1,21 +1,11 @@
-
-
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { signUp } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { useState } from "react";
 
 export default function SignupPage() {
@@ -49,6 +39,7 @@ export default function SignupPage() {
         name,
         password,
       });
+
       if (result.error) {
         setError(result.error.message || "Signup failed");
       } else {
@@ -56,82 +47,149 @@ export default function SignupPage() {
       }
     } catch (err) {
       setError("An error occurred during signup");
-      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create a new account to get started</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f0fdf4] p-6">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+
+        {/* LEFT SECTION */}
+        <div className="px-10 py-12 relative">
+
+          {/* BACK BUTTON */}
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="absolute top-6 left-6 text-green-700 hover:text-green-900 hover:bg-green-50 px-3"
+          >
+            ← Kembali
+          </Button>
+
+          {/* Logo */}
+          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-6 mt-4">
+            <span className="text-green-700 font-semibold text-xl">P</span>
+          </div>
+
+          <h2 className="text-3xl font-bold text-gray-900">Buat Akun Baru</h2>
+          <p className="text-gray-600 mt-2">
+            Daftar untuk mulai mengelola transaksi dan inventaris toko Anda.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            {/* NAME */}
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label className="text-gray-700">Nama</Label>
               <Input
-                id="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder="Toko Makmur"
+                className="bg-gray-100 border-gray-200 text-gray-900 focus:ring-green-300"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
+
+            {/* EMAIL */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label className="text-gray-700">Email</Label>
               <Input
-                id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="tokomakmur@example.com"
+                className="bg-gray-100 border-gray-200 text-gray-900 focus:ring-green-300"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
+
+            {/* PASSWORD */}
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label className="text-gray-700">Kata Sandi</Label>
               <Input
-                id="password"
                 type="password"
                 placeholder="••••••••"
+                className="bg-gray-100 border-gray-200 text-gray-900 focus:ring-green-300"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
+
+            {/* CONFIRM */}
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label className="text-gray-700">Konfirmasi Kata Sandi</Label>
               <Input
-                id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
+                className="bg-gray-100 border-gray-200 text-gray-900 focus:ring-green-300"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
             </div>
+
+            {/* ERROR MESSAGE */}
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div className="rounded-md bg-red-100 p-3 text-sm text-red-600 border border-red-200">
                 {error}
               </div>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account..." : "Sign Up"}
+
+            {/* BUTTON */}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-md shadow-md"
+            >
+              {loading ? "Membuat Akun..." : "Daftar"}
             </Button>
           </form>
-        </CardContent>
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
-            Login
-          </Link>
+
+          {/* LOGIN LINK */}
+          <p className="mt-6 text-sm text-gray-700 text-center">
+            Sudah punya akun?{" "}
+            <Link href="/login" className="text-green-700 hover:underline">
+              Masuk
+            </Link>
+          </p>
         </div>
-      </Card>
+
+        {/* RIGHT SECTION */}
+        <div className="hidden md:flex flex-col justify-center px-10 bg-gradient-to-br from-green-600 to-green-700 text-white relative">
+
+          {/* Background Illustration */}
+          <div className="absolute inset-0 opacity-10 bg-[url('https://cdn-icons-png.flaticon.com/512/891/891462.png')] bg-cover blur-2xl"></div>
+
+          <div className="relative z-10">
+            <h3 className="text-2xl font-semibold mb-4">
+              Sistem POS Mudah Digunakan
+            </h3>
+            <p className="text-white/80 text-[15px] leading-relaxed">
+              Kelola transaksi, stok barang, pelanggan, dan laporan keuangan —
+              semua dalam satu dashboard yang cepat dan efisien.
+            </p>
+
+            <div className="flex gap-6 mt-10 opacity-90">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                🧾
+              </div>
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                📦
+              </div>
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                📊
+              </div>
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                🛍️
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }

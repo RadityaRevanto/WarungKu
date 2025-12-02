@@ -1,13 +1,6 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { signIn } from "@/lib/auth-client";
@@ -16,7 +9,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function LoginPage() {
-
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,10 +21,8 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const result = await signIn.email({
-        email,
-        password,
-      });
+      const result = await signIn.email({ email, password });
+
       if (result.error) {
         setError(result.error.message || "Signin failed");
       } else {
@@ -40,72 +30,125 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError("An error occurred during signin");
-      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form 
-          onSubmit={handleSubmit} 
-          className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#f0fdf4]">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+
+        {/* LEFT SECTION */}
+        <div className="px-10 py-12 relative">
+
+          {/* BACK BUTTON */}
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="absolute top-6 left-6 text-green-700 hover:text-green-900 hover:bg-green-50 px-3"
+          >
+            ← Kembali
+          </Button>
+
+          {/* Logo */}
+          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-6 mt-4">
+            <span className="text-green-700 font-semibold text-xl">P</span>
+          </div>
+
+          <h2 className="text-3xl font-bold text-gray-900">
+            Masuk ke akun POS Anda
+          </h2>
+          <p className="text-gray-600 mt-2">
+            Kelola transaksi dan stok dengan lebih mudah dalam satu sistem.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label className="text-gray-700">Email</Label>
               <Input
-                id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="kamu@example.com"
+                className="bg-gray-100 border-gray-200 text-gray-900 focus:ring-green-300"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex justify-between">
+                <Label className="text-gray-700">Kata Sandi</Label>
+                <Link href="/forgot-password" className="text-sm text-green-700 hover:underline">
+                  Lupa Kata Sandi?
+                </Link>
+              </div>
               <Input
-                id="password"
                 type="password"
                 placeholder="••••••••"
+                className="bg-gray-100 border-gray-200 text-gray-900 focus:ring-green-300"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
+
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div className="rounded-md bg-red-100 p-3 text-sm text-red-600 border border-red-200">
                 {error}
               </div>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-lg text-md shadow-md"
+            >
+              {loading ? "Memproses..." : "Masuk"}
             </Button>
           </form>
-        </CardContent>
-        <div className="mt-4 space-y-2 text-center text-sm">
-          <Link
-            href="/forgot-password"
-            className="text-primary hover:underline"
-          >
-            Forgot your password?
-          </Link>
-          <div>
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-primary hover:underline">
-              Sign up
+
+          <p className="mt-6 text-sm text-gray-600 text-center">
+            Belum punya akun?{" "}
+            <Link href="/register" className="text-green-700 hover:underline">
+              Daftar sekarang
             </Link>
-          </div>
+          </p>
         </div>
-      </Card>
+
+        {/* RIGHT SECTION */}
+        <div className="hidden md:flex flex-col justify-center px-10 bg-gradient-to-br from-green-600 to-green-700 text-white relative">
+
+          {/* Background Illustration */}
+          <div className="absolute inset-0 opacity-10 bg-[url('https://cdn-icons-png.flaticon.com/512/891/891462.png')] bg-cover blur-2xl"></div>
+
+          <div className="relative z-10">
+            <h3 className="text-2xl font-semibold mb-4">
+              Sistem POS Cepat & Andal
+            </h3>
+            <p className="text-white/80 text-[15px] leading-relaxed">
+              Catat transaksi, kelola inventaris, dan lihat laporan keuangan
+              langsung dengan mudah — praktis untuk kasir, toko, atau UMKM.
+            </p>
+
+            <div className="flex gap-6 mt-10 opacity-90">
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                💳
+              </div>
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                📦
+              </div>
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                📈
+              </div>
+              <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center text-white text-2xl">
+                🛒
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 }

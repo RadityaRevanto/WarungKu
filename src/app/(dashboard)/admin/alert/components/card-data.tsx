@@ -30,9 +30,10 @@ const STATUS_CONFIG: Record<
   outOfStock: {
     title: "Stok Habis",
     description: "Produk berikut sudah habis dan tidak bisa dijual",
-    wrapperClass: "@container/card border-red-400 bg-red-50",
-    listClass: "mt-4 space-y-2",
-    badgeClass: "bg-red-600 text-white border-red-600",
+    wrapperClass:
+      "@container/card border-red-300 bg-red-50 rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all",
+    listClass: "mt-5 space-y-3",
+    badgeClass: "bg-red-600 text-white border-red-600 shadow-sm",
     iconColor: "text-red-600",
     textColor: "text-red-600",
     Icon: TriangleAlert,
@@ -40,9 +41,10 @@ const STATUS_CONFIG: Record<
   lowStock: {
     title: "Stok Menipis",
     description: "Produk berikut stoknya di bawah batas minimum",
-    wrapperClass: "@container/card border-yellow-400 bg-yellow-50",
-    listClass: "mt-4 space-y-2",
-    badgeClass: "bg-orange-600 text-white border-orange-600",
+    wrapperClass:
+      "@container/card border-yellow-300 bg-yellow-50 rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all",
+    listClass: "mt-5 space-y-3",
+    badgeClass: "bg-orange-600 text-white border-orange-600 shadow-sm",
     iconColor: "text-yellow-600",
     textColor: "text-yellow-600",
     Icon: TriangleAlert,
@@ -50,9 +52,10 @@ const STATUS_CONFIG: Record<
   safeStock: {
     title: "Stok Aman",
     description: "Produk dengan stok mencukupi",
-    wrapperClass: "@container/card border-green-400 bg-green-50",
-    listClass: "mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2",
-    badgeClass: "bg-green-600 text-white border-green-600",
+    wrapperClass:
+      "@container/card border-green-300 bg-green-50 rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all",
+    listClass: "mt-5 grid grid-cols-1 gap-4 md:grid-cols-2",
+    badgeClass: "bg-green-600 text-white border-green-600 shadow-sm",
     iconColor: "text-green-600",
     textColor: "text-green-600",
     Icon: CheckCircle,
@@ -69,75 +72,104 @@ const formatCurrency = (value: number) =>
 export function CardData({ products, isLoading }: CardDataProps) {
   return (
     <div className="flex flex-col gap-10">
-      {(Object.entries(STATUS_CONFIG) as Array<[StockStatus, (typeof STATUS_CONFIG)[StockStatus]]>).map(
+      {(Object.entries(
+        STATUS_CONFIG
+      ) as Array<[StockStatus, (typeof STATUS_CONFIG)[StockStatus]]>).map(
         ([status, config]) => {
-          const IconComponent = status === "safeStock" ? config.Icon : config.Icon;
+          const IconComponent = config.Icon;
           const items = products?.[status] ?? [];
           const isEmpty = !isLoading && items.length === 0;
 
           return (
             <div
               key={status}
-              className="dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:shadow-xs lg:px-6"
+              className="grid grid-cols-1 gap-4 px-4 lg:px-6"
             >
               <Card className={config.wrapperClass}>
-                <CardHeader>
+                <CardHeader className="space-y-2 pb-5">
+                  
+                  {/* Header Title */}
                   <div className="flex items-center gap-2">
-                    <IconComponent className={`${config.iconColor} size-8`} />
-                    <CardDescriptionAlert className={`${config.textColor} text-3xl`}>
+                    <IconComponent className={`${config.iconColor} size-7`} />
+                    <CardDescriptionAlert
+                      className={`${config.textColor} text-2xl font-semibold`}
+                    >
                       {config.title}
                     </CardDescriptionAlert>
                   </div>
-                  <CardDescriptionAlert className="text-slate-500">
+
+                  <CardDescriptionAlert className="text-slate-600 text-base">
                     {config.description}
                   </CardDescriptionAlert>
+
+                  {/* List */}
                   <div className={config.listClass}>
+                    
+                    {/* Loading Skeleton */}
                     {isLoading && (
-                      <Card className="@container/card border-dashed border-slate-200 bg-slate-50">
-                        <CardHeader>
+                      <Card className="border border-slate-200 bg-slate-50 rounded-xl shadow-sm">
+                        <CardHeader className="space-y-3 py-3">
                           <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
                           <div className="h-3 w-3/4 animate-pulse rounded bg-slate-100" />
                         </CardHeader>
                       </Card>
                     )}
+
+                    {/* Empty State */}
                     {isEmpty && (
-                      <Card className="@container/card border-slate-200 bg-white">
+                      <Card className="border border-slate-200 bg-white rounded-xl shadow-sm">
                         <CardHeader>
-                          <CardDescriptionAlert className="text-slate-500">
+                          <CardDescriptionAlert className="text-slate-500 text-sm">
                             Tidak ada data untuk kategori ini.
                           </CardDescriptionAlert>
                         </CardHeader>
                       </Card>
                     )}
+
+                    {/* Product Items */}
                     {!isLoading &&
                       items.map((product) => (
                         <Card
                           key={product.id}
-                          className={`@container/card border ${status === "safeStock" ? "border-green-400 bg-green-100" : status === "lowStock" ? "border-yellow-400 bg-yellow-100" : "border-red-400 bg-pink-100"}`}
+                          className={`border rounded-xl shadow-sm px-1 ${
+                            status === "safeStock"
+                              ? "border-green-300 bg-green-100"
+                              : status === "lowStock"
+                              ? "border-yellow-300 bg-yellow-100"
+                              : "border-red-300 bg-pink-100"
+                          }`}
                         >
-                          <CardHeader>
+                          <CardHeader className="py-3">
                             <div className="flex items-center justify-between">
+                              
+                              {/* Product Name */}
                               <div className="flex items-center gap-2">
                                 {status === "safeStock" ? (
-                                  <Box className="size-5 text-slate-700" />
+                                  <Box className="size-4 text-slate-700" />
                                 ) : (
-                                  <TriangleAlert className="size-5 text-slate-700" />
+                                  <TriangleAlert className="size-4 text-slate-700" />
                                 )}
-                                <CardDescriptionAlert className="text-black-600 text-xl">
+                                <CardDescriptionAlert className="text-base font-medium">
                                   {product.name}
                                 </CardDescriptionAlert>
                               </div>
-                              <Badge
-                                className={`${config.badgeClass} rounded-sm px-3 py-2`}
-                              >
+
+                              {/* Badge */}
+                              <Badge className={`${config.badgeClass} rounded-md px-2.5 py-1 text-xs`}>
                                 {status === "safeStock"
                                   ? product.stock
                                   : `Stok: ${product.stock}${
-                                      status === "lowStock" ? ` | Min: ${product.minStock}` : ""
+                                      status === "lowStock"
+                                        ? ` | Min: ${product.minStock}`
+                                        : ""
                                     }`}
                               </Badge>
                             </div>
-                            <CardDescriptionAlert className={`${config.textColor} text-xl font-normal`}>
+
+                            {/* Price */}
+                            <CardDescriptionAlert
+                              className={`${config.textColor} text-base font-semibold`}
+                            >
                               {formatCurrency(product.price)}
                             </CardDescriptionAlert>
                           </CardHeader>
