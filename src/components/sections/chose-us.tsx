@@ -1,14 +1,19 @@
 
 
+import Image from "next/image";
+
 export default function Choseus() {
     return (
         <section id="choseus" className="relative min-h-screen w-full overflow-hidden">
             <div className="container mx-auto px-4">
                 <div className="xl:flex xl:flex-row-reverse xl:items-center xl:justify-center xl:gap-12 xl:px-8">
                     <div className="mx-auto md:w-140 xl:mx-0 xl:mt-0 xl:flex-shrink-0 xl:w-200">
-                        <img
+                        <Image
                             src="/assets/images/choseus/icon-choseus.png"
                             alt="About decor"
+                            width={800}
+                            height={800}
+                            loading="lazy"
                             className="h-full w-full object-cover"
                         />
                     </div>
