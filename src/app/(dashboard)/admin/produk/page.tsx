@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/src/app/(dashboard)/_components/dashboard-layout";
 import { createColumns } from "./components/column";
 import { DataTable } from "./components/data-table";
 import { MyFormData } from "./components/table";
-import { useOnlineStatus } from "@/src/hooks/use-online-status";
-import { offlineQueue } from "@/src/lib/offline-queue";
-import { syncService } from "@/src/lib/sync-service";
-import { toast } from "sonner";
+
 import {
   Dialog,
   DialogContent,
@@ -17,8 +14,11 @@ import {
   DialogTitle,
 } from "@/src/components/ui/dialog";
 import { UserForm } from "./components/form";
-import { Badge } from "@/src/components/ui/badge";
-import { Wifi, WifiOff, Cloud, CloudOff } from "lucide-react";
+import { Button } from "@/src/components/ui/button";
+import { RefreshCw, Wifi, WifiOff, Cloud, CloudOff } from "lucide-react";
+import { toast } from "sonner";
+import { warungDB } from "@/src/lib/indexeddb"; // ← Ubah dari productDB ke warungDB
+import { syncService } from "@/src/lib/sync-service";
 
 export default function TablePage() {
   const [data, setData] = useState<MyFormData[]>([]);
@@ -26,241 +26,184 @@ export default function TablePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogKey, setDialogKey] = useState(0);
   const [mounted, setMounted] = useState(false);
-  const [pendingCount, setPendingCount] = useState(0);
-  const isOnline = useOnlineStatus();
+  const [isOnline, setIsOnline] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [pendingChanges, setPendingChanges] = useState(0);
   const columns = createColumns();
-  
-  // Fetch products - harus didefinisikan sebelum digunakan
-  const fetchProducts = useCallback(async () => {
-    try {
-      const response = await fetch("/api/admin/products");
-      const productsData = await response.json();
 
-      const tableData = productsData.map((p: any) => ({
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Mount check
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Initialize IndexedDB and sync
+  useEffect(() => {
+    if (!mounted) return;
+
+    const initDB = async () => {
+      try {
+        await warungDB.init(); // ← Ubah
+        await loadProductsFromIndexedDB();
+        
+        // Start auto sync
+        syncService.startAutoSync(30000);
+        
+        // Initial sync from server
+        await syncService.syncFromServer();
+        await loadProductsFromIndexedDB();
+      } catch (error) {
+        console.error('Failed to init DB:', error);
+        toast.error('Gagal menginisialisasi database lokal');
+      }
+    };
+
+    initDB();
+
+    return () => {
+      syncService.stopAutoSync();
+    };
+  }, [mounted]);
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast.success('Kembali online! Syncing data...');
+      syncService.manualSync().then(() => loadProductsFromIndexedDB());
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast.warning('Mode offline. Perubahan akan disimpan lokal.');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    setIsOnline(navigator.onLine);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Check pending changes periodically
+  useEffect(() => {
+    if (!mounted) return;
+
+    const checkPending = async () => {
+      const pending = await warungDB.getPendingChanges(); // ← Ubah
+      setPendingChanges(pending.length);
+    };
+
+    checkPending();
+    const interval = setInterval(checkPending, 5000);
+
+    return () => clearInterval(interval);
+  }, [mounted]);
+
+  // Load products from IndexedDB
+  const loadProductsFromIndexedDB = async () => {
+    try {
+      const products = await warungDB.getAllProducts(); // ← Ubah
+      
+      const tableData: MyFormData[] = products.map((p) => ({
         id: p.id,
         name_4603829743: p.name,
         name_0878515932: String(p.price),
         name_0706064476: p.stock,
         name_6646786819: p.barcode || "",
-        name_6646786821: p.minStock ?? 10,
+        name_6646786821: p.minStock,
       }));
 
       setData(tableData);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.error('Error loading from IndexedDB:', error);
+      toast.error('Gagal memuat produk dari database lokal');
     }
-  }, []);
-  
-  useEffect(() => {
-    setMounted(true);
-    // Initialize offline queue
-    offlineQueue.init().catch(console.error);
-    
-    // Start auto sync
-    syncService.startAutoSync(5000).catch(console.error);
-    
-    // Update pending count periodically
-    const updatePendingCount = async () => {
-      const count = await offlineQueue.getPendingCount();
-      setPendingCount(count);
-    };
-    
-    updatePendingCount();
-    const interval = setInterval(updatePendingCount, 2000);
-    
-    return () => clearInterval(interval);
-  }, []);
-  
-  // Fetch products on mount
-  useEffect(() => {
-    if (mounted) {
-      fetchProducts();
-    }
-  }, [mounted, fetchProducts]);
-  
-  // Sync when coming back online
-  useEffect(() => {
-    if (isOnline && mounted) {
-      syncService.syncPendingProducts().then(async () => {
-        const count = await offlineQueue.getPendingCount();
-        setPendingCount(count);
-        // Refresh data setelah sync untuk menampilkan produk yang baru di-sinkronkan
-        if (count === 0) {
-          fetchProducts();
-        }
-      });
-    }
-  }, [isOnline, mounted, fetchProducts]);
+  };
 
-  // Listen untuk event productsSynced
-  useEffect(() => {
-    const handleProductsSynced = () => {
-      fetchProducts();
-      offlineQueue.getPendingCount().then(setPendingCount);
-    };
-
-    window.addEventListener('productsSynced', handleProductsSynced);
-    return () => {
-      window.removeEventListener('productsSynced', handleProductsSynced);
-    };
-  }, [fetchProducts]);
-
-  // ... rest of your handlers (handleCreate, handleUpdate, etc.)
-  // [Gunakan kode yang sudah ada sebelumnya]
-
+  // Create product (offline-first)
   const handleCreate = async (newRecord: Omit<MyFormData, "id">) => {
-    const body = {
-      name: newRecord.name_4603829743,
-      price: Number(newRecord.name_0878515932),
-      stock: newRecord.name_0706064476,
-      barcode: String(newRecord.name_6646786819),
-      minStock: newRecord.name_6646786821 ?? 10,
-    };
-
-    // Jika offline, simpan ke queue
-    if (!isOnline) {
-      try {
-        await offlineQueue.addProduct({ data: body });
-        const count = await offlineQueue.getPendingCount();
-        setPendingCount(count);
-        
-        // Tampilkan di UI dengan temporary ID
-        const tempId = `temp_${Date.now()}`;
-        const newData = {
-          id: tempId,
-          name_4603829743: body.name,
-          name_0878515932: String(body.price),
-          name_0706064476: body.stock,
-          name_6646786819: body.barcode || "",
-          name_6646786821: body.minStock ?? 10,
-        };
-        
-        setData((prev) => [...prev, newData]);
-        setIsDialogOpen(false);
-        setEditingUser(null);
-        setDialogKey(prev => prev + 1);
-        
-        toast.success("Produk disimpan secara offline. Akan di-sinkronkan ketika online.");
-        return;
-      } catch (error) {
-        console.error("Error saving to offline queue:", error);
-        toast.error("Gagal menyimpan produk ke queue offline");
-        return;
-      }
-    }
-
-    // Jika online, kirim langsung ke server
     try {
-      const res = await fetch("/api/admin/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+      const product = await warungDB.addProduct({ // ← Ubah
+        name: newRecord.name_4603829743,
+        price: Number(newRecord.name_0878515932),
+        stock: newRecord.name_0706064476,
+        barcode: String(newRecord.name_6646786819) || null,
+        minStock: newRecord.name_6646786821 ?? 10,
+        userId: 'current-user-id', // Replace with actual user ID
       });
 
-      if (!res.ok) {
-        // Jika gagal, coba simpan ke queue
-        if (!navigator.onLine) {
-          await offlineQueue.addProduct({ data: body });
-          const count = await offlineQueue.getPendingCount();
-          setPendingCount(count);
-          toast.warning("Koneksi terputus. Produk disimpan untuk sinkronisasi nanti.");
-          return;
-        }
-        throw new Error("Failed to create product");
-      }
-
-      const created = await res.json();
-
-      const newData = {
-        id: created.id,
-        name_4603829743: created.name,
-        name_0878515932: String(created.price),
-        name_0706064476: created.stock,
-        name_6646786819: created.barcode || "",
-        name_6646786821: created.minStock ?? 10,
-      };
-
-      setData((prev) => [...prev, newData]);
+      await loadProductsFromIndexedDB();
+      
       setIsDialogOpen(false);
       setEditingUser(null);
       setDialogKey(prev => prev + 1);
       
-      toast.success("Produk berhasil dibuat");
+      toast.success('Produk berhasil ditambahkan (offline)');
+
+      // Trigger sync
+      if (isOnline) {
+        syncService.syncToServer().then(() => loadProductsFromIndexedDB());
+      }
     } catch (error) {
       console.error("Create product error:", error);
-      
-      // Coba simpan ke queue jika error
-      try {
-        await offlineQueue.addProduct({ data: body });
-        const count = await offlineQueue.getPendingCount();
-        setPendingCount(count);
-        toast.warning("Gagal mengirim ke server. Produk disimpan untuk sinkronisasi nanti.");
-      } catch (queueError) {
-        toast.error("Gagal membuat produk");
-      }
+      toast.error('Gagal menambahkan produk');
     }
   };
 
+  // Update product (offline-first)
   const handleUpdate = async (updatedUser: MyFormData) => {
     try {
-      const body = {
+      await warungDB.updateProduct(updatedUser.id, { // ← Ubah
         name: updatedUser.name_4603829743,
         price: Number(updatedUser.name_0878515932),
         stock: updatedUser.name_0706064476,
-        barcode: String(updatedUser.name_6646786819),
+        barcode: String(updatedUser.name_6646786819) || null,
         minStock: updatedUser.name_6646786821 ?? 10,
-      };
+      } as any);
 
-      const res = await fetch(`/api/admin/products/${updatedUser.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error("Failed to update product:", errorData);
-        alert(`Error: ${errorData.error || 'Unknown error'}`);
-        return;
-      }
-
-      const updated = await res.json();
-
-      setData((prevData) => {
-        return prevData.map((record) => {
-          if (record.id === updated.id) {
-            return {
-              id: updated.id,
-              name_4603829743: updated.name,
-              name_0878515932: String(updated.price),
-              name_0706064476: updated.stock,
-              name_6646786819: updated.barcode || "",
-              name_6646786821: updated.minStock ?? 10,
-            };
-          }
-          return record;
-        });
-      });
-
+      await loadProductsFromIndexedDB();
+      
       setIsDialogOpen(false);
       setEditingUser(null);
       setDialogKey(prev => prev + 1);
+      
+      toast.success('Produk berhasil diupdate (offline)');
+
+      // Trigger sync
+      if (isOnline) {
+        syncService.syncToServer().then(() => loadProductsFromIndexedDB());
+      }
     } catch (error) {
       console.error("Update error:", error);
+      toast.error('Gagal mengupdate produk');
     }
   };
 
+  // Delete product (offline-first)
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete product");
+      await warungDB.deleteProduct(id); // ← Ubah
+      await loadProductsFromIndexedDB();
+      
+      toast.success('Produk berhasil dihapus (offline)');
 
-      setData((prev) => prev.filter((record) => record.id !== id));
+      // Trigger sync
+      if (isOnline) {
+        syncService.syncToServer().then(() => loadProductsFromIndexedDB());
+      }
     } catch (error) {
       console.error(error);
+      toast.error('Gagal menghapus produk');
     }
   };
 
+  // Open edit dialog
   const handleEdit = (record: MyFormData) => {
     const clonedRecord = JSON.parse(JSON.stringify(record)) as MyFormData;
     setEditingUser(clonedRecord);
@@ -268,42 +211,86 @@ export default function TablePage() {
     setDialogKey(prev => prev + 1);
   };
 
+  // Open create dialog
   const openCreateDialog = () => {
     setEditingUser(null);
     setIsDialogOpen(true);
     setDialogKey(prev => prev + 1);
   };
 
+  // Manual sync
+// Manual sync
+const handleManualSync = async () => {
+  if (!isOnline) {
+    toast.error('Tidak dapat sync saat offline');
+    return;
+  }
+
+  setIsSyncing(true);
+  try {
+    await syncService.manualSync();
+    await loadProductsFromIndexedDB();
+    toast.success('Sinkronisasi berhasil!');
+  } catch (error) {
+    console.error('Sync error:', error);
+    toast.error(error instanceof Error ? error.message : 'Gagal melakukan sinkronisasi');
+  } finally {
+    setIsSyncing(false);
+  }
+};
+
   if (!mounted) {
-    return null; // atau <LoadingSpinner />
+    return null;
   }
 
   return (
     <DashboardLayout>
       <div className="p-6">
-        {/* Status Indicator */}
-        <div className="mb-4 flex items-center gap-2">
-          {isOnline ? (
-            <Badge variant="default" className="gap-1">
-              <Wifi className="h-3 w-3" />
-              Online
-            </Badge>
-          ) : (
-            <Badge variant="destructive" className="gap-1">
-              <WifiOff className="h-3 w-3" />
-              Offline
-            </Badge>
-          )}
-          {pendingCount > 0 && (
-            <Badge variant="outline" className="gap-1">
+        {/* Status Bar */}
+        <div className="mb-4 flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               {isOnline ? (
-                <Cloud className="h-3 w-3" />
+                <>
+                  <Wifi className="w-5 h-5 text-green-600" />
+                  <span className="text-sm font-medium text-green-600">Online</span>
+                </>
               ) : (
-                <CloudOff className="h-3 w-3" />
+                <>
+                  <WifiOff className="w-5 h-5 text-orange-600" />
+                  <span className="text-sm font-medium text-orange-600">Offline</span>
+                </>
               )}
-              {pendingCount} produk menunggu sinkronisasi
-            </Badge>
-          )}
+            </div>
+
+            {pendingChanges > 0 && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-orange-100 rounded-full">
+                <CloudOff className="w-4 h-4 text-orange-600" />
+                <span className="text-sm font-medium text-orange-600">
+                  {pendingChanges} perubahan belum tersinkron
+                </span>
+              </div>
+            )}
+
+            {pendingChanges === 0 && isOnline && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-100 rounded-full">
+                <Cloud className="w-4 h-4 text-green-600" />
+                <span className="text-sm font-medium text-green-600">
+                  Semua data tersinkron
+                </span>
+              </div>
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleManualSync}
+            disabled={isSyncing || !isOnline}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing ? 'Syncing...' : 'Sync Now'}
+          </Button>
         </div>
 
         <Dialog
